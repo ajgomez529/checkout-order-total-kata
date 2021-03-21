@@ -44,6 +44,7 @@ class MarkdownTest(unittest.TestCase):
         self.co_sys = checkout.CheckoutSystem()
         self.co_sys.register_item('onion', 1.00, 'lbs')
         self.co_sys.register_item('soda', 1.00)
+
     # add markdown with no limit (default = None)
     def test_add_markdown_no_limit(self):
         self.co_sys.markdown('soda', 0.50)
@@ -75,6 +76,49 @@ class MarkdownTest(unittest.TestCase):
     def test_calc_markdown_weight_limit(self):
         self.co_sys.markdown('onion', 0.50, 5)
         self.assertEqual(self.co_sys.calculate_price('onion', 7.50), 5.00)
+
+class NforXTest(unittest.TestCase):
+    def setUp(self):
+        self.co_sys = checkout.CheckoutSystem()
+        self.co_sys.register_item('onion', 1.00, 'lbs')
+        self.co_sys.register_item('soda', 1.00)
+
+    # add NforX special, no limit
+    def test_add_NforX_no_limit(self):
+        self.co_sys.NforX('soda', 3, 2.00)
+        item = self.co_sys.items['soda']
+        self.assertEqual(item.special, [2, 3, 2.00, None])
+    
+    # add NforX special, limit
+    def test_add_NforX_limit(self):
+        self.co_sys.NforX('onion', 2, 1.50, 3)
+        item = self.co_sys.items['onion']
+        self.assertEqual(item.special, [2, 2, 1.50, 3])
+
+    # calc price with NforX special, no limit
+    def test_calc_NforX_no_limit(self):
+        self.co_sys.NforX('soda', 3, 2.00)
+        self.assertEqual(self.co_sys.calculate_price('soda', 10), 7.00)
+    
+    # calc price with NforX special, limit
+    def test_calc_NforX_limit(self):
+        self.co_sys.NforX('soda', 5, 3.50, 10)
+        self.assertEqual(self.co_sys.calculate_price('soda', 15), 12.00)
+
+    # calc weighed item price with NforX special, no limit
+    def test_calc_NforX_weighed_no_limit(self):
+        self.co_sys.NforX('onion', 2, 1.50)
+        self.assertEqual(self.co_sys.calculate_price('onion', 5.5), 4.5)
+    
+    # calc weighed item price with NforX special, limit
+    def test_calc_NforX_weighed_limit(self):
+        self.co_sys.NforX('onion', 10, 5.00, 10)
+        self.assertEqual(self.co_sys.calculate_price('onion', 20), 15.00)
+    
+    # calc NforX when qty < N
+    def test_calc_NforX_low_qty(self):
+        self.co_sys.NforX('soda', 4, 2.00)
+        self.assertEqual(self.co_sys.calculate_price('soda', 2), 2.00)
 
 
 if __name__ == '__main__':
