@@ -163,5 +163,23 @@ class buyNgetMatXoffTest(unittest.TestCase):
         self.co_sys.buyNgetMatXoff('soda', 10, 10, 100)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 9.00)
 
+
+class OrderTest(unittest.TestCase):
+    def setUp(self):
+        self.co_sys = checkout.CheckoutSystem()
+        self.co_sys.register_item('onion', 1.00, 'lbs')
+        self.co_sys.register_item('soda', 1.00)
+        self.order = checkout.Order(self.co_sys)
+
+    # scan unit item
+    def test_scan_item(self):
+        self.order.scan_item('soda')
+        self.assertEqual(self.order.scanned_items['soda'], 1)
+    
+    # scan weighed item
+    def test_scan_weighed_item(self):
+        self.order.scan_item('onion', 4.5)
+        self.assertEqual(self.order.scanned_items['onion'], 4.5)
+            
 if __name__ == '__main__':
     unittest.main()
