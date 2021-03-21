@@ -169,7 +169,7 @@ class CheckoutSystem:
         else:
             params = item.special
             limit = params[-1]
-            if qty > limit: 
+            if limit is not None and qty > limit: 
                 return item.price * (qty-limit) + \
                     self.calculate_special(params, item.price, limit)
             else:
