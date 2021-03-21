@@ -226,3 +226,86 @@ class CheckoutSystem:
                 return total
             else:
                 return price * qty
+
+class Order():
+    """Creates a checkout session for scanning items and returning total.
+
+    Attributes:
+        scanned_items: a dictionary containing the scanned item and quantity.
+          the item name is stored as the key; the quantity is stored as the
+          value.
+        __checkout_sys: required; a CheckoutSystem object to be used for 
+          accessing item information and computing totals. This attribute is
+          'private' and should not be accessed directly outside of class
+          methods. 
+        total: stores the current total price of the order. the total will
+          update when new items are scanned/removed or the calculate_total
+          function is called. otherwise, prices are considered 'locked in'.
+          for example, if a special is added to an item and the total
+          is requested, the special will not be applied unless an action is
+          triggered to recalculate the total. 
+
+    """
+    def __init__(self, checkout_sys):
+        self.scanned_items = {}
+        self.__checkout_sys = checkout_sys
+        self.total = 0
+
+    def scan_item(self, name, qty=1):
+        """Adds an item to the order and recalculates total
+
+        Args:
+            name: item name as a string (e.g. 'soup')
+            qty: optional; float or int representing the amount of the item 
+              being purchased in its 'soldBy' field. for items sold by unit,
+              an int must be provided (default = 1)
+        """
+
+        if name in self.scanned_items:
+            self.scanned_items[name] += qty
+        else:
+            if name in self.__checkout_sys.items:
+                self.scanned_items[name] = qty
+
+        self.calculate_total()
+
+    def remove_item(self, name, qty=1):
+        """Removes an item from the order and recalculates total
+
+        Args:
+            name: item name as a string (e.g. 'soup')
+            qty: optional; float or int representing the amount of the item
+              being purchased in its 'soldBy' field. for items sold by unit,
+              an int must be provided (default = 1)
+        """
+
+        if name in self.scanned_items:
+            if qty >= self.scanned_items[name]:  # allow larger qty
+                self.scanned_items.pop(name)
+            else:
+                self.scanned_items[name] -= qty
+
+        self.calculate_total()
+    
+    def calculate_total(self):
+        """Calculates total of items in scanned_items.
+
+        Calculate_total calls the CheckoutSytem method calculate_price() and
+        sums the prices for each item name/qty pair stored in scanned_items.
+        The class attribute total is then updated with the new value. 
+
+        Args: None
+        """
+        newTotal = 0
+        for k, v in self.scanned_items.items():
+            newTotal += self.__checkout_sys.calculate_price(k, v)
+        self.total = newTotal
+
+    def return_total(self):
+        """Returns current order total"""
+        return self.total
+
+    
+          
+          
+
