@@ -38,7 +38,43 @@ class ItemSetUp(unittest.TestCase):
         self.assertEqual(item.price, 1.25)
         self.co_sys.update_price('bread', 2.00)
         self.assertEqual(item.price, 2.00)
+
+class MarkdownTest(unittest.TestCase):
+    def setUp(self):
+        self.co_sys = checkout.CheckoutSystem()
+        self.co_sys.register_item('onion', 1.00, 'lbs')
+        self.co_sys.register_item('soda', 1.00)
+    # add markdown with no limit (default = None)
+    def test_add_markdown_no_limit(self):
+        self.co_sys.markdown('soda', 0.50)
+        item = self.co_sys.items['soda']
+        self.assertEqual(item.special, [1, 0.50, None])
     
+    # add markdown with limit
+    def test_add_markdown_limit(self):
+        self.co_sys.markdown('soda', 0.25, 5)
+        item = self.co_sys.items['soda']
+        self.assertEqual(item.special, [1, 0.25, 5])
+
+    # calculate price w/ markdown, unit item, no limit
+    def test_calc_markdown_no_limit(self):
+       self.co_sys.markdown('soda', 0.50)
+       self.assertEqual(self.co_sys.calculate_price('soda', 20), 10.00)
+    
+    # calculate price w/ markdown, unit item, limit
+    def test_calc_markdown_limit(self):
+        self.co_sys.markdown('soda', 0.50, 5)
+        self.assertEqual(self.co_sys.calculate_price('soda', 10), 7.50)
+    
+    #calculate price w/ markdown, weighed item, no limit
+    def test_calc_markdown_weight(self):
+        self.co_sys.markdown('onion', 0.50)
+        self.assertEqual(self.co_sys.calculate_price('onion', 1.50), 0.75)
+    
+    # calculate price w/markdown, weighed item, limit
+    def test_calc_markdown_weight_limit(self):
+        self.co_sys.markdown('onion', 0.50, 5)
+        self.assertEqual(self.co_sys.calculate_price('onion', 7.50), 5.00)
 
 
 if __name__ == '__main__':
