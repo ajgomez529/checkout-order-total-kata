@@ -180,6 +180,27 @@ class OrderTest(unittest.TestCase):
     def test_scan_weighed_item(self):
         self.order.scan_item('onion', 4.5)
         self.assertEqual(self.order.scanned_items['onion'], 4.5)
+    
+    # remove item
+    def test_remove_item(self):
+        self.order.scan_item('onion', 2.5)
+        self.order.remove_item('onion', 1)
+        self.assertEqual(self.order.scanned_items['onion'], 1.5)
+    
+    # calculate single item total
+    def test_item_total(self):
+        self.order.scan_item('onion', 4.5)
+        self.assertEqual(self.order.return_total(), 4.50)
+    
+    # calculate multi item total
+    def test_multi_item_total(self):
+        self.order.scan_item('soda')
+        self.order.scan_item('soda')
+        self.order.scan_item('onion', 4.5)
+        self.assertEqual(self.order.return_total(), 6.50) 
+ 
+
+
             
 if __name__ == '__main__':
     unittest.main()
