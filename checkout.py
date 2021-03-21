@@ -37,7 +37,8 @@ class CheckoutSystem:
             soldBy: optional; how the item is sold as string (e.g. 'lbs').
               if not provided, 'unit' is assumed.
         """
-        pass
+        item = Item(name, price, soldBy)
+        self.items[name] = item
 
     def unregister_item(self, name):
         """Removes item from checkout system.
@@ -48,7 +49,7 @@ class CheckoutSystem:
             name: item name as string (e.g. 'soup').
         """
 
-        pass
+        self.items.pop(name)
 
     def update_price(self, name, price):
         """Updates price of an existing item
@@ -58,7 +59,7 @@ class CheckoutSystem:
             price: new price in USD as float (e.g. 2.99).
         """
 
-        pass
+        self.items[name].price = price
 
     def markdown(self, name, discount, limit=None):
         """Applies a markdown special to an existing item.
@@ -79,7 +80,7 @@ class CheckoutSystem:
               discount may be applied to
         """
 
-        pass
+        self.items[name].special = [1, discount, limit]
 
     def NforX(self, name, N, X, limit=None):
         """Applies a N for $X special to an existing item.
@@ -102,7 +103,7 @@ class CheckoutSystem:
               eligible under the special. value must be a multiple of N
         """
 
-        pass
+        self.items[name].special = [2, N, X, limit]
 
     def buyNgetMatXoff(self, name, N, M, X, limit=None):
         """Applies a buy N, get M for X% off special to an existing item.
@@ -113,7 +114,7 @@ class CheckoutSystem:
         a maximum of {limit} units. Applies to items sold by unit and weight.
 
         This function sets the Item class attribute 'special' for the named
-        item to the following array: [2, N, M, X, limit]
+        item to the following array: [3, N, M, X, limit]
         The first entry, 3, identifies the type of special. 
 
         Args:
@@ -128,7 +129,7 @@ class CheckoutSystem:
             limit: optional; int representing the maximum number of units
               eligible under the special. value must be a multiple of N+M
         """
-        pass
+        self.items[name].special = [3, N, M, X, limit]
     
     def remove_special(self, name):
         """Removes an existing special applied to an item.
@@ -136,14 +137,15 @@ class CheckoutSystem:
         Args:
             name: item name as string (e.g. 'soup')
         """
-        pass
+        self.items[name].special = None
 
     def remove_all_specials(self):
         """Removes all specials applied to all items.
 
         Args: none
         """
-        pass
+        for item in self.items.values():
+            item.special = None
 
     def calculate_price(self, name, qty):
         """Calculates the price for a given item and quantity.
@@ -161,7 +163,19 @@ class CheckoutSystem:
             A float representing the total price for {qty} units of an item
         """
 
-        pass
+        item = self.items[name]
+        if item.special == None:
+            return item.price * qty
+        else:
+            params = item.special
+            limit = params[-1]
+            if qty > limit: 
+                return item.price * (qty-limit) + \
+                    self.calculate_special(params, item.price, limit)
+            else:
+                return self.calculate_special(params, item.price, qty)
+
+
 
     def calculate_special(self, params, price, qty):
         """Calculates the special price for a given item and quantity.
@@ -176,5 +190,38 @@ class CheckoutSystem:
             A float representing the total price for {qty} units of an item
             with appropriate special applied. 
         """
+        # markdown special
+        if params[0] == 1:
+            discount = params[1]
+            return (price - discount) * qty
 
-        pass
+        # N for X Special
+        if params[0] == 2:
+            N = params[1]
+            X = params[2]
+            if qty >= N:
+                return (qty // N) * X + (qty % N) * price
+            else:
+                return price * qty
+
+        # Buy N, Get M at X% off special
+        if params[0] == 3:
+            N = params[1]
+            M = params[2]
+            X = 1 - params[3] / 100
+
+            if qty > N:
+                total = 0
+                m_price = price * X
+                special_price = (N * price) + (M * m_price)
+                
+                special_count = qty // (N + M)
+                total += special_count * special_price
+
+                rem = qty % (N + M)
+                if rem > N:
+                    total += (N * price) + ((rem - N) * m_price)
+                else:
+                    total += rem * price
+            else:
+                return price * qty
