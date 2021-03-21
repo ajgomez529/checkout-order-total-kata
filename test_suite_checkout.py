@@ -120,6 +120,48 @@ class NforXTest(unittest.TestCase):
         self.co_sys.NforX('soda', 4, 2.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 2), 2.00)
 
+class buyNgetMatXoffTest(unittest.TestCase):
+    def setUp(self):
+        self.co_sys = checkout.CheckoutSystem()
+        self.co_sys.register_item('onion', 1.00, 'lbs')
+        self.co_sys.register_item('soda', 1.00)
+
+    # add special, no limit
+    def test_add_buyNMX_no_limit(self):
+        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
+        item = self.co_sys.items['soda']
+        self.assertEqual(item.special, [3, 1, 1, 100, None])
+
+    # add special, limit
+    def test_add_buyNMX_limit(self):
+        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100, 4)
+        item = self.co_sys.items['soda']
+        self.assertEqual(item.special, [3, 1, 1, 100, 4])
+    
+    # calc special, no limit
+    def test_calc_buyNMX_no_limit(self):
+        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
+        self.assertEqual(self.co_sys.calculate_price('soda', 10), 5.00)
+    
+    # calc special, limit
+    def test_calc_buyNMX_limit(self):
+        self.co_sys.buyNgetMatXoff('soda', 2, 2, 50, 8)
+        self.assertEqual(self.co_sys.calculate_price('soda', 12), 10)
+
+    # calc special, weighed item, no limit
+    def test_calc_buyNMX_weighed_no_limit(self):
+        self.co_sys.buyNgetMatXoff('onion', 2, 1, 50)
+        self.assertEqual(self.co_sys.calculate_price('onion', 4.75), 4.25)
+
+    # calc special, weighed item, limit
+    def test_calc_buyNMX_weighed_limit(self):
+        self.co_sys.buyNgetMatXoff('onion', 4, 4, 100, 16)
+        self.assertEqual(self.co_sys.calculate_price('onion', 20), 12.00)
+    
+    #calc special, qty < N
+    def test_calc_buyNMX_low_qty(self):
+        self.co_sys.buyNgetMatXoff('soda', 10, 10, 100)
+        self.assertEqual(self.co_sys.calculate_price('soda', 9), 9.00)
 
 if __name__ == '__main__':
     unittest.main()
