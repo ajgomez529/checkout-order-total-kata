@@ -5,6 +5,7 @@ class Item:
         name: item name as string (e.g. 'soup').
         price: price in USD as float (e.g. 2.99).
         soldBy: how the item is sold as string (e.g. 'lbs').
+        markdown: float representing discount off regular price
         special: init as None; stores parameters for special savings on
           item. Only one special can be applied at a time.
     """
@@ -13,6 +14,7 @@ class Item:
         self.name = name
         self.price = price
         self.soldBy = soldBy
+        self.markdown = None
         self.special = None
 
 class CheckoutSystem:
@@ -61,26 +63,45 @@ class CheckoutSystem:
 
         self.items[name].price = price
 
-    def markdown(self, name, discount, limit=None):
-        """Applies a markdown special to an existing item.
+    def markdown(self, name, discount):
+        """Applies a markdown to an existing item.
 
         When a markdown is applied to an item, the item price will be reduced
-        by {discount}. The savings can be applied to a max of {limit} units.
+        by {discount}.
 
-        This function sets the Item class attribute 'special' for the named
-        item to the following array: [1, discount, limit]
-        The first entry, 1, identifies the type of special. 
-
+        This function sets the Item class attribute 'markdown' for the named
+        item to the discount value.
 
         Args:
             name: item name as string (e.g. 'soup').
             discount: price reduction in USD as float (e.g. 0.50). Value
               should not exceed price of item.
-            limit: Optional; int representing the maximum number of units the
-              discount may be applied to
         """
 
-        self.items[name].special = [1, discount, limit]
+        self.items[name].markdown = discount
+    
+    def remove_markdown(self, name):
+        """Removes a markdown from an existing item.
+
+        This function sets the Item class attribute for the named item to
+        None. 
+
+        Args:
+            name: item name as string (e.g 'soup')
+        """
+
+        self.items[name].markdown = None
+
+    def remove_all_markdowns(self):
+        """Removes markdown from all items in checkout system.
+
+        This function sets the Item class atrribute for all all items
+        to None.
+
+        Args: None
+        """
+        for item in self.items.values():
+            item.markdown = None
 
     def NforX(self, name, N, X, limit=None):
         """Applies a N for $X special to an existing item.
@@ -134,6 +155,9 @@ class CheckoutSystem:
     def remove_special(self, name):
         """Removes an existing special applied to an item.
 
+        This function sets the Item class attribute 'special' for the named
+        item to None.
+
         Args:
             name: item name as string (e.g. 'soup')
         """
@@ -141,6 +165,9 @@ class CheckoutSystem:
 
     def remove_all_specials(self):
         """Removes all specials applied to all items.
+
+        This function sets the Item class attribute 'special' for all items
+        in the CheckoutSystem to None.
 
         Args: none
         """
@@ -152,7 +179,7 @@ class CheckoutSystem:
 
         Computes price for a given item and quantity. If the item has a
         special applied, calculate_price will call calculate_special to
-        determine the discount pricing
+        determine the discount pricing. 
 
         Args:
             name: item name as string (e.g. 'soup')
@@ -164,16 +191,21 @@ class CheckoutSystem:
         """
 
         item = self.items[name]
-        if item.special == None:
+        if item.special is None and item.markdown is None:
             return item.price * qty
-        else:
+        elif item.special is None and item.markdown is not None:
+            return (item.price - item.markdown) * qty
+        elif item.special is not None:
             params = item.special
             limit = params[-1]
+            price = item.price
+            if item.markdown is not None:
+                price -= item.markdown
             if limit is not None and qty > limit: 
-                return item.price * (qty-limit) + \
-                    self.calculate_special(params, item.price, limit)
+                return price * (qty-limit) + \
+                    self.calculate_special(params, price, limit)
             else:
-                return self.calculate_special(params, item.price, qty)
+                return self.calculate_special(params, price, qty)
 
 
 
@@ -190,10 +222,6 @@ class CheckoutSystem:
             A float representing the total price for {qty} units of an item
             with appropriate special applied. 
         """
-        # markdown special
-        if params[0] == 1:
-            discount = params[1]
-            return (price - discount) * qty
 
         # N for X Special
         if params[0] == 2:
