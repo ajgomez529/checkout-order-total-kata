@@ -223,5 +223,6 @@ class CheckoutSystem:
                     total += (N * price) + ((rem - N) * m_price)
                 else:
                     total += rem * price
+                return total
             else:
                 return price * qty
