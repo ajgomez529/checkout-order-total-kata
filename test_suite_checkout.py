@@ -39,6 +39,10 @@ class ItemSetUp(unittest.TestCase):
         self.co_sys.update_price('bread', 2.00)
         self.assertEqual(item.price, 2.00)
 
+    # update price of nonexistant item produces KeyError
+    def test_update_price_no_item(self):
+        self.assertRaises(KeyError, self.co_sys.update_price, 'dfsd', 1.50)
+    
 class MarkdownTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
@@ -68,6 +72,10 @@ class MarkdownTest(unittest.TestCase):
     # ValueError if markdown is greater than item price
     def test_too_large_markdown(self):
         self.assertRaises(ValueError, self.co_sys.markdown, 'onion', 1.50)
+
+    # KeyError if item does not exist
+    def test_markdown_no_item(self):
+        self.assertRaises(KeyError, self.co_sys.markdown, 'onion1', 2.00)
     
 class NforXTest(unittest.TestCase):
     def setUp(self):
@@ -112,6 +120,10 @@ class NforXTest(unittest.TestCase):
         self.co_sys.NforX('soda', 4, 2.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 2), 2.00)
 
+    # KeyError if no item
+    def test_NforX_no_item(self):
+        self.assertRaises(KeyError, self.co_sys.NforX, "pop", 4, 3, 4)
+
 class buyNgetMatXoffTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
@@ -150,10 +162,14 @@ class buyNgetMatXoffTest(unittest.TestCase):
         self.co_sys.buyNgetMatXoff('onion', 4, 4, 100, 16)
         self.assertEqual(self.co_sys.calculate_price('onion', 20), 12.00)
     
-    #calc special, qty < N
+    # calc special, qty < N
     def test_calc_buyNMX_low_qty(self):
         self.co_sys.buyNgetMatXoff('soda', 10, 10, 100)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 9.00)
+
+    # KeyError if no item
+    def test_buyNMX_no_item(self):
+        self.assertRaises(KeyError, self.co_sys.buyNgetMatXoff, "pop", 10, 10, 100)
 
 
 class OrderTest(unittest.TestCase):
@@ -168,6 +184,20 @@ class OrderTest(unittest.TestCase):
         self.order.scan_item('soda')
         self.assertEqual(self.order.scanned_items['soda'], 1)
     
+    # ValueError if scanning unit item with non int value
+    def test_scan_unit_item_bad_qty(self):
+        self.assertRaises(ValueError, self.order.scan_item, 'soda', 1.5)
+    
+    # scan unit item in integer qty > 1
+    def test_scan_many_unit_items(self):
+        self.order.scan_item('soda')
+        self.order.scan_item('soda', 2)
+        self.assertEqual(self.order.scanned_items['soda'], 3)
+    
+    # KeyError if item not in CheckoutSystem
+    def test_scan_bad_item_name(self):
+        self.assertRaises(KeyError, self.order.scan_item, 'pepsi', 1)
+    
     # scan weighed item
     def test_scan_weighed_item(self):
         self.order.scan_item('onion', 4.5)
@@ -176,8 +206,12 @@ class OrderTest(unittest.TestCase):
     # remove item
     def test_remove_item(self):
         self.order.scan_item('onion', 2.5)
-        self.order.remove_item('onion', 1)
+        self.order.remove_item_qty('onion', 1)
         self.assertEqual(self.order.scanned_items['onion'], 1.5)
+
+    # ValueError if attempting to remove item not in cart
+    def test_remove_no_item(self):
+        self.assertRaises(ValueError, self.order.remove_item_qty, 'pop', 1)
     
     # calculate single item total
     def test_item_total(self):
@@ -190,6 +224,11 @@ class OrderTest(unittest.TestCase):
         self.order.scan_item('soda')
         self.order.scan_item('onion', 4.5)
         self.assertEqual(self.order.return_total(), 6.50) 
+        
+    # ValueError if removing unit item in non-integer value
+    def test_remove_unit_item_bad_qty(self):
+        self.assertRaises(ValueError,self.order.remove_item_qty, "soda", 1.5)
+
  
 
 

@@ -49,6 +49,9 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g. 'soup').
+
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
 
         self.items.pop(name)
@@ -59,6 +62,9 @@ class CheckoutSystem:
         Args:
             name: item name as string (e.g. 'soup').
             price: new price in USD as float (e.g. 2.99).
+        
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
 
         self.items[name].price = price
@@ -79,6 +85,7 @@ class CheckoutSystem:
 
         Raises:
             ValueError if discount is less than 0 or greater than the item price
+            KeyError if item name does not exist in CheckoutSystem
         """
         if discount < 0 or discount > self.items[name].price:
             raise ValueError('Discount cannot be less than 0 or more than the item price')
@@ -93,6 +100,9 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g 'soup')
+
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
 
         self.items[name].markdown = None
@@ -127,6 +137,9 @@ class CheckoutSystem:
             X: total price for N units as float
             limit: optional; int representing the maximum number of units 
               eligible under the special. value must be a multiple of N
+        
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
 
         self.items[name].special = [2, N, X, limit]
@@ -154,6 +167,9 @@ class CheckoutSystem:
               discount (i.e. free).
             limit: optional; int representing the maximum number of units
               eligible under the special. value must be a multiple of N+M
+
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
         self.items[name].special = [3, N, M, X, limit]
     
@@ -165,6 +181,9 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g. 'soup')
+        
+        Raises:
+            KeyError if item name does not exist in CheckoutSystem
         """
         self.items[name].special = None
 
@@ -291,29 +310,42 @@ class Order():
             name: item name as a string (e.g. 'soup')
             qty: optional; float or int representing the amount of the item 
               being purchased in its 'soldBy' field. for items sold by unit,
-              an int must be provided (default = 1)
+              an integer value must be provided for qty
+        Raises:
+            KeyError if item name does not exist in checkout_sys
         """
 
         if name in self.scanned_items:
             self.scanned_items[name] += qty
         else:
-            if name in self.__checkout_sys.items:
+            item = self.__checkout_sys.items[name]
+            if item.soldBy == 'unit' and not isinstance(qty, int):
+                raise ValueError('Qty for unit item must be an integer')
+            else:
                 self.scanned_items[name] = qty
 
         self.calculate_total()
 
-    def remove_item(self, name, qty=1):
+    def remove_item_qty(self, name, qty=1):
         """Removes an item from the order and recalculates total
 
         Args:
             name: item name as a string (e.g. 'soup')
             qty: optional; float or int representing the amount of the item
               being purchased in its 'soldBy' field. for items sold by unit,
-              an int must be provided (default = 1)
+              an integer value must be provided for qty
+              
+        Raises:
+            ValueError if item name not in order
         """
 
-        if name in self.scanned_items:
-            if qty >= self.scanned_items[name]:  # allow larger qty
+        if name not in self.scanned_items:
+            raise ValueError("Item not in order")
+        else:
+            item = self.__checkout_sys.items[name]
+            if item.soldBy == 'unit' and not isinstance(qty, int):
+                raise ValueError('Qty must be integer value for item sold by unit')
+            elif qty >= self.scanned_items[name]:  # allow larger qty
                 self.scanned_items.pop(name)
             else:
                 self.scanned_items[name] -= qty
