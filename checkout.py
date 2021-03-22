@@ -76,9 +76,14 @@ class CheckoutSystem:
             name: item name as string (e.g. 'soup').
             discount: price reduction in USD as float (e.g. 0.50). Value
               should not exceed price of item.
-        """
 
-        self.items[name].markdown = discount
+        Raises:
+            ValueError if discount is less than 0 or greater than the item price
+        """
+        if discount < 0 or discount > self.items[name].price:
+            raise ValueError('Discount cannot be less than 0 or more than the item price')
+        else:
+            self.items[name].markdown = discount
     
     def remove_markdown(self, name):
         """Removes a markdown from an existing item.

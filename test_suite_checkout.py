@@ -45,38 +45,30 @@ class MarkdownTest(unittest.TestCase):
         self.co_sys.register_item('onion', 1.00, 'lbs')
         self.co_sys.register_item('soda', 1.00)
 
-    # add markdown with no limit (default = None)
+    # add markdown 
     def test_add_markdown_no_limit(self):
         self.co_sys.markdown('soda', 0.50)
         item = self.co_sys.items['soda']
-        self.assertEqual(item.special, [1, 0.50, None])
-    
-    # add markdown with limit
-    def test_add_markdown_limit(self):
-        self.co_sys.markdown('soda', 0.25, 5)
-        item = self.co_sys.items['soda']
-        self.assertEqual(item.special, [1, 0.25, 5])
+        self.assertEqual(item.markdown, 0.50)
 
-    # calculate price w/ markdown, unit item, no limit
+    # calculate price w/ markdown, unit item
     def test_calc_markdown_no_limit(self):
        self.co_sys.markdown('soda', 0.50)
        self.assertEqual(self.co_sys.calculate_price('soda', 20), 10.00)
     
-    # calculate price w/ markdown, unit item, limit
-    def test_calc_markdown_limit(self):
-        self.co_sys.markdown('soda', 0.50, 5)
-        self.assertEqual(self.co_sys.calculate_price('soda', 10), 7.50)
-    
-    #calculate price w/ markdown, weighed item, no limit
+    # calculate price w/ markdown, weighed item
     def test_calc_markdown_weight(self):
         self.co_sys.markdown('onion', 0.50)
         self.assertEqual(self.co_sys.calculate_price('onion', 1.50), 0.75)
     
-    # calculate price w/markdown, weighed item, limit
-    def test_calc_markdown_weight_limit(self):
-        self.co_sys.markdown('onion', 0.50, 5)
-        self.assertEqual(self.co_sys.calculate_price('onion', 7.50), 5.00)
-
+    # ValueError if markdown is less than 0
+    def test_negative_markdown(self):
+        self.assertRaises(ValueError, self.co_sys.markdown, 'onion', -0.50)
+    
+    # ValueError if markdown is greater than item price
+    def test_too_large_markdown(self):
+        self.assertRaises(ValueError, self.co_sys.markdown, 'onion', 1.50)
+    
 class NforXTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
