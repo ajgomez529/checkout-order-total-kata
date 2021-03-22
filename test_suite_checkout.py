@@ -124,6 +124,12 @@ class NforXTest(unittest.TestCase):
     def test_NforX_no_item(self):
         self.assertRaises(KeyError, self.co_sys.NforX, "pop", 4, 3, 4)
 
+    #calc price with markdown and NforX special
+    def test_calc_NforX_markdown(self):
+        self.co_sys.markdown('soda', 0.50)
+        self.co_sys.NforX('soda', 5, 3.00)
+        self.assertEqual(self.co_sys.calculate_price('soda', 9), 5.00)
+
 class buyNgetMatXoffTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
@@ -166,6 +172,12 @@ class buyNgetMatXoffTest(unittest.TestCase):
     def test_calc_buyNMX_low_qty(self):
         self.co_sys.buyNgetMatXoff('soda', 10, 10, 100)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 9.00)
+
+    # calc special with markdown
+    def test_calc_buyNMX_markdown(self):
+        self.co_sys.markdown('soda', 0.50)
+        self.co_sys.buyNgetMatXoff('soda', 5, 5, 50)
+        self.assertEqual(self.co_sys.calculate_price('soda', 12), 4.75)
 
     # KeyError if no item
     def test_buyNMX_no_item(self):
