@@ -133,15 +133,30 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g. 'soup').
-            N: int representing the number of units
-            X: total price for N units as float
+            N: positive int representing the number of units
+            X: total price for N units as float, must be greater than 0.01
             limit: optional; int representing the maximum number of units 
               eligible under the special. value must be a multiple of N
         
         Raises:
             KeyError if item name does not exist in CheckoutSystem
+            ValueError:
+                if N is not a positive integer
+                if X is less than 0.01
+                if limit is not an integer multiple of N 
         """
 
+        if not isinstance(N, int) or N < 1:
+            raise ValueError("N must be positive integer")
+        
+        if X <0.01:
+            raise ValueError("X must be $0.01 or greater")
+        
+        if limit is not None:
+            if not isinstance(limit, int) or limit < 1 or limit % N !=0:
+                raise ValueError("Limit must be integer multiple of N")
+
+        
         self.items[name].special = [2, N, X, limit]
 
     def buyNgetMatXoff(self, name, N, M, X, limit=None):
@@ -158,19 +173,39 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g. 'soup')
-            N: int representing the number of units that must be purchased at
-              full price to quality for discount
-            M: int representing the number of units after N units that may
-              receive the discounted price
-            X: float representing the discount as a percent. For example, a
-              value of 100 indicates that M items may be purchased at a 100%
-              discount (i.e. free).
-            limit: optional; int representing the maximum number of units
-              eligible under the special. value must be a multiple of N+M
+            N: positive int representing the number of units that must be 
+              purchased at full price to quality for discount
+            M: positive int representing the number of units after N units
+              that may receive the discounted price
+            X: int ranging from 1-100 representing the discount as a percent.
+              For example, a value of 100 indicates that M items may be
+              purchased at a 100% discount (i.e. free).
+            limit: optional; positive int representing the maximum number of 
+              units eligible under the special. value must be a multiple of 
+              N+M
 
         Raises:
             KeyError if item name does not exist in CheckoutSystem
+            ValueError:
+                if N is not positive int
+                if M is not positive int
+                if X is not int between 1 and 100
+                if limit is not int or not a multiple of N + M
         """
+        if not isinstance(N, int) or N < 1:
+            raise ValueError("N must be positive integer")
+        
+        if not isinstance(M, int) or M < 1:
+            raise ValueError("M must be positive integer")
+        
+        if not isinstance(X, int) or X < 1 or X > 100:
+            raise ValueError("X must be an integer between 1 and 100")
+        
+        if limit is not None:
+            if not isinstance(limit, int) or limit<2 or limit % (N + M) != 0:
+                raise ValueError("limit must be integer multiple of N+M")
+
+
         self.items[name].special = [3, N, M, X, limit]
     
     def remove_special(self, name):
