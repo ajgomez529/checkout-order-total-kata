@@ -20,9 +20,9 @@ class Item:
 class CheckoutSystem:
     """A checkout system that maintains a list of items and calculates prices
 
-    Attributes: 
+    Attributes:
         items: dictionary holding Item objects. Item name is stored as key;
-          Item object is stored as value. 
+          Item object is stored as value.
     """
 
     def __init__(self):
@@ -67,7 +67,7 @@ class CheckoutSystem:
         Args:
             name: item name as string (e.g. 'soup').
             price: new price in USD as float (e.g. 2.99).
-        
+
         Raises:
             KeyError if item name does not exist in CheckoutSystem
             ValueError if price is less than $0.01
@@ -75,6 +75,7 @@ class CheckoutSystem:
 
         if price < 0.01:
             raise ValueError('Price must be greater than zero')
+
         self.items[name].price = price
 
     def markdown(self, name, discount):
@@ -96,15 +97,15 @@ class CheckoutSystem:
             KeyError if item name does not exist in CheckoutSystem
         """
         if discount < 0 or discount > self.items[name].price:
-            raise ValueError('Discount cannot be less than 0 or more than the item price')
+            raise ValueError('Discount cannot be < 0 or > than item price')
         else:
             self.items[name].markdown = discount
-    
+
     def remove_markdown(self, name):
         """Removes a markdown from an existing item.
 
         This function sets the Item class attribute for the named item to
-        None. 
+        None.
 
         Args:
             name: item name as string (e.g 'soup')
@@ -131,40 +132,40 @@ class CheckoutSystem:
 
         When applied to an item, {N} units of that item may be purchased for
         the total price of ${X} dollars. For example, "3 cans for $5.00" or
-        "2 lbs of ground beef for $6". The special can be limited to a 
+        "2 lbs of ground beef for $6". The special can be limited to a
         maximum of {limit} units. Applies to items sold by unit and weight.
 
         This function sets the Item class attribute 'special' for the named
         item to the following array: [2, N, X, limit]
-        The first entry, 2, identifies the type of special. 
-        
+        The first entry, 2, identifies the type of special.
+
 
         Args:
             name: item name as string (e.g. 'soup').
             N: positive int representing the number of units
             X: total price for N units as float, must be greater than 0.01
-            limit: optional; int representing the maximum number of units 
+            limit: optional; int representing the maximum number of units
               eligible under the special. value must be a multiple of N
-        
+
         Raises:
             KeyError if item name does not exist in CheckoutSystem
             ValueError:
                 if N is not a positive integer
                 if X is less than 0.01
-                if limit is not an integer multiple of N 
+                if limit is not an integer multiple of N
         """
 
         if not isinstance(N, int) or N < 1:
             raise ValueError("N must be positive integer")
-        
-        if X <0.01:
+
+        if X < 0.01:
             raise ValueError("X must be $0.01 or greater")
-        
+
         if limit is not None:
-            if not isinstance(limit, int) or limit < 1 or limit % N !=0:
+            if not isinstance(limit, int) or limit < 1 or limit % N != 0:
                 raise ValueError("Limit must be integer multiple of N")
 
-        
+
         self.items[name].special = [2, N, X, limit]
 
     def buyNgetMatXoff(self, name, N, M, X, limit=None):
@@ -177,19 +178,19 @@ class CheckoutSystem:
 
         This function sets the Item class attribute 'special' for the named
         item to the following array: [3, N, M, X, limit]
-        The first entry, 3, identifies the type of special. 
+        The first entry, 3, identifies the type of special.
 
         Args:
             name: item name as string (e.g. 'soup')
-            N: positive int representing the number of units that must be 
+            N: positive int representing the number of units that must be
               purchased at full price to quality for discount
             M: positive int representing the number of units after N units
               that may receive the discounted price
             X: int ranging from 1-100 representing the discount as a percent.
               For example, a value of 100 indicates that M items may be
               purchased at a 100% discount (i.e. free).
-            limit: optional; positive int representing the maximum number of 
-              units eligible under the special. value must be a multiple of 
+            limit: optional; positive int representing the maximum number of
+              units eligible under the special. value must be a multiple of
               N+M
 
         Raises:
@@ -202,20 +203,20 @@ class CheckoutSystem:
         """
         if not isinstance(N, int) or N < 1:
             raise ValueError("N must be positive integer")
-        
+
         if not isinstance(M, int) or M < 1:
             raise ValueError("M must be positive integer")
-        
+
         if not isinstance(X, int) or X < 1 or X > 100:
             raise ValueError("X must be an integer between 1 and 100")
-        
+
         if limit is not None:
-            if not isinstance(limit, int) or limit<2 or limit % (N + M) != 0:
+            if not isinstance(limit, int) or limit < 2 or limit % (N + M) != 0:
                 raise ValueError("limit must be integer multiple of N+M")
 
 
         self.items[name].special = [3, N, M, X, limit]
-    
+
     def remove_special(self, name):
         """Removes an existing special applied to an item.
 
@@ -224,7 +225,6 @@ class CheckoutSystem:
 
         Args:
             name: item name as string (e.g. 'soup')
-        
         Raises:
             KeyError if item name does not exist in CheckoutSystem
         """
@@ -246,7 +246,7 @@ class CheckoutSystem:
 
         Computes price for a given item and quantity. If the item has a
         special applied, calculate_price will call calculate_special to
-        determine the discount pricing. 
+        determine the discount pricing.
 
         Args:
             name: item name as string (e.g. 'soup')
@@ -268,7 +268,7 @@ class CheckoutSystem:
             price = item.price
             if item.markdown is not None:
                 price -= item.markdown
-            if limit is not None and qty > limit: 
+            if limit is not None and qty > limit:
                 return price * (qty-limit) + \
                     self.calculate_special(params, price, limit)
             else:
@@ -287,7 +287,7 @@ class CheckoutSystem:
 
         Returns:
             A float representing the total price for {qty} units of an item
-            with appropriate special applied. 
+            with appropriate special applied.
         """
 
         # N for X Special
@@ -309,7 +309,7 @@ class CheckoutSystem:
                 total = 0
                 m_price = price * X
                 special_price = (N * price) + (M * m_price)
-                
+
                 special_count = qty // (N + M)
                 total += special_count * special_price
 
@@ -329,18 +329,18 @@ class Order():
         scanned_items: a dictionary containing the scanned item and quantity.
           the item name is stored as the key; the quantity is stored as the
           value.
-        __checkout_sys: required; a CheckoutSystem object to be used for 
+        __checkout_sys: required; a CheckoutSystem object to be used for
           accessing item information and computing totals. This attribute is
           'private' and should not be accessed directly outside of class
-          methods. 
+          methods.
         total: stores the current total price of the order. the total will
           update when new items are scanned/removed or the calculate_total
           function is called. otherwise, prices are considered 'locked in'.
           for example, if a special is added to an item and the total
           is requested, the special will not be applied unless an action is
-          triggered to recalculate the total. 
-
+          triggered to recalculate the total.
     """
+
     def __init__(self, checkout_sys):
         self.scanned_items = {}
         self.__checkout_sys = checkout_sys
@@ -387,14 +387,14 @@ class Order():
         else:
             item = self.__checkout_sys.items[name]
             if item.soldBy == 'unit' and not isinstance(qty, int):
-                raise ValueError('Qty must be integer value for item sold by unit')
+                raise ValueError('Qty must be int value for item sold by unit')
             elif qty >= self.scanned_items[name]:  # allow larger qty
                 self.scanned_items.pop(name)
             else:
                 self.scanned_items[name] -= qty
 
         self.calculate_total()
-    
+
     def calculate_total(self):
         """Calculates total of items in scanned_items.
 
@@ -412,8 +412,3 @@ class Order():
     def return_total(self):
         """Returns current order total"""
         return self.total
-
-    
-          
-          
-
