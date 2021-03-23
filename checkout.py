@@ -38,7 +38,12 @@ class CheckoutSystem:
             price: price in USD as float (e.g. 2.99).
             soldBy: optional; how the item is sold as string (e.g. 'lbs').
               if not provided, 'unit' is assumed.
+        Raises:
+            ValueError if price is less than $0.01
         """
+        if price < 0.01:
+            raise ValueError("Price must be greater than zero")
+
         item = Item(name, price, soldBy)
         self.items[name] = item
 
@@ -65,8 +70,11 @@ class CheckoutSystem:
         
         Raises:
             KeyError if item name does not exist in CheckoutSystem
+            ValueError if price is less than $0.01
         """
 
+        if price < 0.01:
+            raise ValueError('Price must be greater than zero')
         self.items[name].price = price
 
     def markdown(self, name, discount):

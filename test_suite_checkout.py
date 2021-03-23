@@ -43,6 +43,17 @@ class ItemSetUp(unittest.TestCase):
     def test_update_price_no_item(self):
         self.assertRaises(KeyError, self.co_sys.update_price, 'dfsd', 1.50)
     
+    # ValueError if adding item with price < 0.01
+    def test_price_too_low(self):
+        self.assertRaises(ValueError, self.co_sys.register_item, 'soup', -0.01)
+
+    # ValueError if updating item price to value < 0.01
+    def test_update_price_too_low(self):
+        self.co_sys.register_item('pop', 1.00)
+        self.assertRaises(ValueError, self.co_sys.update_price, 'pop', -1.20)
+    
+
+    
 class MarkdownTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
