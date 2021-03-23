@@ -1,3 +1,34 @@
+"""Module for grocery point-of-sale system
+
+Item class stores information for individual grocery items (not used directly)
+
+CheckoutSystem class registers and maintains a list of items for sale. It also
+provides functions for creating markdowns/specials and calculating item prices
+
+Order class maintains the name and quantity of items being purchased and
+stores the total cost. It provides functions for scanning/removing items. A
+CheckoutSystem object must be provided as input to access list of valid items
+and price calculation functions.
+
+Usage example:
+    import checkout
+
+    checkout_sys = checkout.CheckoutSystem()
+    checkout_sys.register_item('yogurt', 1.00)
+    checkout_sys.register_item('ground beef', 3.00, 'lb')
+
+    checkout_sys.markdown('yogurt', 0.25)
+    checkout_sys.buyNgetMatXoff('ground beef', 2, 1, 100)
+
+    order = checkout.Order(checkout_sys)
+
+    order.scan_item('yogurt')
+    order.scan_item('ground beef', 3.0)
+    print (order.return_total())
+    -> 6.75
+"""
+
+
 class Item:
     """Stores information for single item used in checkout
 
@@ -351,7 +382,7 @@ class Order():
 
         Args:
             name: item name as a string (e.g. 'soup')
-            qty: optional; float or int representing the amount of the item 
+            qty: optional; float or int representing the amount of the item
               being purchased in its 'soldBy' field. for items sold by unit,
               an integer value must be provided for qty
         Raises:
@@ -377,7 +408,7 @@ class Order():
             qty: optional; float or int representing the amount of the item
               being purchased in its 'soldBy' field. for items sold by unit,
               an integer value must be provided for qty
-              
+
         Raises:
             ValueError if item name not in order
         """
@@ -400,7 +431,7 @@ class Order():
 
         Calculate_total calls the CheckoutSytem method calculate_price() and
         sums the prices for each item name/qty pair stored in scanned_items.
-        The class attribute total is then updated with the new value. 
+        The class attribute total is then updated with the new value.
 
         Args: None
         """
