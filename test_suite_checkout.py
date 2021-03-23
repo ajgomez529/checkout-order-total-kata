@@ -91,9 +91,9 @@ class NforXTest(unittest.TestCase):
     
     # add NforX special, limit
     def test_add_NforX_limit(self):
-        self.co_sys.NforX('onion', 2, 1.50, 3)
+        self.co_sys.NforX('onion', 2, 1.50, 4)
         item = self.co_sys.items['onion']
-        self.assertEqual(item.special, [2, 2, 1.50, 3])
+        self.assertEqual(item.special, [2, 2, 1.50, 4])
 
     # calc price with NforX special, no limit
     def test_calc_NforX_no_limit(self):
@@ -129,6 +129,28 @@ class NforXTest(unittest.TestCase):
         self.co_sys.markdown('soda', 0.50)
         self.co_sys.NforX('soda', 5, 3.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 5.00)
+
+    #Pass non integer value for N
+    def test_non_int_N(self):
+        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5.5, 3.00)
+    
+    # negative value for N
+    def test_negative_int_N(self):
+        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', -1, 4.00)
+ 
+    # pass limit that is not multiple of N
+    def test_limit_not_multiple(self):
+        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, 3.00, 7)
+    
+    # pass non int limit
+    def test_limit_not_int(self):
+        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, 3.00, 1.1)
+    
+    # X less than 0.01
+    def test_x_not_valid(self):
+        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, -0.01)
+    
+ 
 
 class buyNgetMatXoffTest(unittest.TestCase):
     def setUp(self):
@@ -182,7 +204,38 @@ class buyNgetMatXoffTest(unittest.TestCase):
     # KeyError if no item
     def test_buyNMX_no_item(self):
         self.assertRaises(KeyError, self.co_sys.buyNgetMatXoff, "pop", 10, 10, 100)
+    
+    # test non int value for N
+    def test_N_not_int(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5.5, 2, 100)
 
+     # test negative value for N
+    def test_N_negative(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', -1, 2, 100)
+    
+    # test non int value for M
+    def test_M_not_int(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2.2, 100)
+    
+    # test negative value for M
+    def test_M_negative(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, -2.2, 100)
+    
+    # test non int value for X
+    def test_X_not_int(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 50.5)
+
+    # test X out of bounds (1-100)
+    def test_X_out_of_bounds(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 101)
+    
+    # test non int limit
+    def test_limit_not_int(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 100, 14.1)
+    
+    # test limit not multiple of N+M
+    def test_limit_not_multiple(self):
+        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 100, 15)
 
 class OrderTest(unittest.TestCase):
     def setUp(self):
