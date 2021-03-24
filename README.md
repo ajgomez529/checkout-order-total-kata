@@ -4,8 +4,8 @@ Python module implementing business logic for grocery point-of-sale system
 Based on the following: https://github.com/PillarTechnology/kata-checkout-order-total
 
 ## Requirements
-Tested in Python 3.6+.
-No additional dependencies used.
+Tested in Python 3.5+.
+No additional dependencies required for use.
 
 ## Installation
 Place `checkout.py` in your project directory. To run the test suite, ensure `checkout.py` and `test_suite_checkout.py` are in the same directory.
@@ -32,17 +32,45 @@ print (order.return_total())  # returns order total - 3.49
 ```
 
 ## Testing
-To run the full testing suite, run the following command from the shell:
+
+To run the full testing suite, run the following command in the project directory:
 ```
 python3 test_suite_checkout.py
 ```
 
-To test a class of test cases, run the following command from the shell (replace as needed):
+To test a class of test cases, run the following command (replace as needed):
 ```
 python3 test_suite_checkout.py ItemSetUp
 ```
-To run a single test case, run the following command from the shell (replace as needed):
+To run a single test case, run the following command (replace as needed):
 ```
 python3 test_suite_checkout.py ItemSetUp.test_remove_item
+```
+
+
+The test suite is also run in Python 3.5-3.8 upon push to the repository, generating a coverage report.
+
+This Github Actions workflow requires pytest and pytest-cov. To produce the coverage report locally, run the following commands to install the required packages:
+
+```
+pip install pytest
+pip install pytest-cov
+```
+
+Run this command in the project directory to generate the coverage report:
+
+```
+pytest --cov-report term-missing --cov=checkout test_suite_checkout.py
+```
+
+The output should appear in the terminal:
+
+```
+----------- coverage: platform linux, python 3.8.5-final-0 -----------
+Name          Stmts   Miss  Cover   Missing
+-------------------------------------------
+checkout.py     123      0   100%
+-------------------------------------------
+TOTAL           123      0   100%
 ```
 
