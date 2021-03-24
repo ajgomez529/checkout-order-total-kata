@@ -350,5 +350,17 @@ class OrderTest(unittest.TestCase):
         self.assertRaises(ValueError, self.order.remove_item_qty, 'onion', 1)
         self.assertEqual(self.order.scanned_items.get('onion'), None)
 
+    # invalidate special after scanning
+    def test_invalidate_special(self):
+        self.co_sys.n_for_x('soda', 2, 1, 100)
+        self.order.scan_item('soda')
+        self.order.scan_item('soda')
+        self.order.scan_item('soda')
+        self.assertEqual(self.order.return_total(), 2.00)
+        self.co_sys.remove_special('soda')  # invalidate special
+        self.assertEqual(self.order.return_total(), 2.00)  # price unchanged
+        self.order.calculate_total()  # trigger recalculation of total
+        self.assertEqual(self.order.return_total(), 3.00)  # special removed
+
 if __name__ == '__main__':
     unittest.main()

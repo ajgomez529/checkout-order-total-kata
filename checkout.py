@@ -367,9 +367,10 @@ class Order():
         total: stores the current total price of the order. the total will
           update when new items are scanned/removed or the calculate_total
           function is called. otherwise, prices are considered 'locked in'.
-          for example, if a special is added to an item and the total
-          is requested, the special will not be applied unless an action is
-          triggered to recalculate the total.
+          for example, if a special is added/removed from an existing item and
+          return_total() is called, the special will not be applied/removed
+          unless an action is triggered to recalculate the total (e.g
+          scanning an item, removing item, or calling calculate_total()).
     """
 
     def __init__(self, checkout_sys):
@@ -431,7 +432,7 @@ class Order():
 
         Calculate_total calls the CheckoutSytem method calculate_price() and
         sums the prices for each item name/qty pair stored in scanned_items.
-        The class attribute total is then updated with the new value.
+        The class attribute 'total' is then updated with the new value.
 
         Args: None
         """
@@ -441,5 +442,12 @@ class Order():
         self.total = new_total
 
     def return_total(self):
-        """Returns current order total"""
+        """Returns current order total
+
+        Returns the current value stored in class attribute 'total'. Note
+        that this function will not recalculate the total if changes to items
+        (e.g. price update, adding/removing specials or markdowns) have been
+        made since the last invocation of calculate_total()
+
+        """
         return self.total
