@@ -360,7 +360,7 @@ class Order():
         scanned_items: a dictionary containing the scanned item and quantity.
           the item name is stored as the key; the quantity is stored as the
           value.
-        __checkout_sys: required; a CheckoutSystem object to be used for
+        _checkout_sys: required; a CheckoutSystem object to be used for
           accessing item information and computing totals. This attribute is
           'private' and should not be accessed directly outside of class
           methods.
@@ -374,7 +374,7 @@ class Order():
 
     def __init__(self, checkout_sys):
         self.scanned_items = {}
-        self.__checkout_sys = checkout_sys
+        self._checkout_sys = checkout_sys
         self.total = 0
 
     def scan_item(self, name, qty=1):
@@ -392,7 +392,7 @@ class Order():
         if name in self.scanned_items:
             self.scanned_items[name] += qty
         else:
-            item = self.__checkout_sys.items[name]
+            item = self._checkout_sys.items[name]
             if item.sold_by == 'unit' and not isinstance(qty, int):
                 raise ValueError('Qty for unit item must be an integer')
             else:
@@ -416,7 +416,7 @@ class Order():
         if name not in self.scanned_items:
             raise ValueError("Item not in order")
         else:
-            item = self.__checkout_sys.items[name]
+            item = self._checkout_sys.items[name]
             if item.sold_by == 'unit' and not isinstance(qty, int):
                 raise ValueError('Qty must be int value for item sold by unit')
             elif qty >= self.scanned_items[name]:  # allow larger qty
@@ -437,7 +437,7 @@ class Order():
         """
         new_total = 0
         for k, v in self.scanned_items.items():
-            new_total += self.__checkout_sys.calculate_price(k, v)
+            new_total += self._checkout_sys.calculate_price(k, v)
         self.total = new_total
 
     def return_total(self):
