@@ -158,7 +158,7 @@ class CheckoutSystem:
         for item in self.items.values():
             item.markdown = None
 
-    def NforX(self, name, N, X, limit=None):
+    def n_for_x(self, name, N, X, limit=None):
         """Applies a N for $X special to an existing item.
 
         When applied to an item, {N} units of that item may be purchased for

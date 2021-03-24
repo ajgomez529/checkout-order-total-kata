@@ -102,82 +102,82 @@ class MarkdownTest(unittest.TestCase):
         self.assertEqual(self.co_sys.items['soda'].markdown, None)
         self.assertEqual(self.co_sys.items['onion'].markdown, None)
 
-class NforXTest(unittest.TestCase):
+class n_for_xTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
         self.co_sys.register_item('onion', 1.00, 'lbs')
         self.co_sys.register_item('soda', 1.00)
 
-    # add NforX special, no limit
-    def test_add_NforX_no_limit(self):
-        self.co_sys.NforX('soda', 3, 2.00)
+    # add n_for_x special, no limit
+    def test_add_n_for_x_no_limit(self):
+        self.co_sys.n_for_x('soda', 3, 2.00)
         item = self.co_sys.items['soda']
         self.assertEqual(item.special, [2, 3, 2.00, None])
 
-    # add NforX special, limit
-    def test_add_NforX_limit(self):
-        self.co_sys.NforX('onion', 2, 1.50, 4)
+    # add n_for_x special, limit
+    def test_add_n_for_x_limit(self):
+        self.co_sys.n_for_x('onion', 2, 1.50, 4)
         item = self.co_sys.items['onion']
         self.assertEqual(item.special, [2, 2, 1.50, 4])
 
-    # calc price with NforX special, no limit
-    def test_calc_NforX_no_limit(self):
-        self.co_sys.NforX('soda', 3, 2.00)
+    # calc price with n_for_x special, no limit
+    def test_calc_n_for_x_no_limit(self):
+        self.co_sys.n_for_x('soda', 3, 2.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 10), 7.00)
 
-    # calc price with NforX special, limit
-    def test_calc_NforX_limit(self):
-        self.co_sys.NforX('soda', 5, 3.50, 10)
+    # calc price with n_for_x special, limit
+    def test_calc_n_for_x_limit(self):
+        self.co_sys.n_for_x('soda', 5, 3.50, 10)
         self.assertEqual(self.co_sys.calculate_price('soda', 15), 12.00)
 
-    # calc weighed item price with NforX special, no limit
-    def test_calc_NforX_weighed_no_limit(self):
-        self.co_sys.NforX('onion', 2, 1.50)
+    # calc weighed item price with n_for_x special, no limit
+    def test_calc_n_for_x_weighed_no_limit(self):
+        self.co_sys.n_for_x('onion', 2, 1.50)
         self.assertEqual(self.co_sys.calculate_price('onion', 5.5), 4.5)
 
-    # calc weighed item price with NforX special, limit
-    def test_calc_NforX_weighed_limit(self):
-        self.co_sys.NforX('onion', 10, 5.00, 10)
+    # calc weighed item price with n_for_x special, limit
+    def test_calc_n_for_x_weighed_limit(self):
+        self.co_sys.n_for_x('onion', 10, 5.00, 10)
         self.assertEqual(self.co_sys.calculate_price('onion', 20), 15.00)
 
-    # calc NforX when qty < N
-    def test_calc_NforX_low_qty(self):
-        self.co_sys.NforX('soda', 4, 2.00)
+    # calc n_for_x when qty < N
+    def test_calc_n_for_x_low_qty(self):
+        self.co_sys.n_for_x('soda', 4, 2.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 2), 2.00)
 
     # KeyError if no item
-    def test_NforX_no_item(self):
-        self.assertRaises(KeyError, self.co_sys.NforX, "pop", 4, 3, 4)
+    def test_n_for_x_no_item(self):
+        self.assertRaises(KeyError, self.co_sys.n_for_x, "pop", 4, 3, 4)
 
-    #calc price with markdown and NforX special
-    def test_calc_NforX_markdown(self):
+    #calc price with markdown and n_for_x special
+    def test_calc_n_for_x_markdown(self):
         self.co_sys.markdown('soda', 0.50)
-        self.co_sys.NforX('soda', 5, 3.00)
+        self.co_sys.n_for_x('soda', 5, 3.00)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 5.00)
 
     #Pass non integer value for N
     def test_non_int_N(self):
-        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5.5, 3.00)
+        self.assertRaises(ValueError, self.co_sys.n_for_x, 'soda', 5.5, 3.00)
 
     # negative value for N
     def test_negative_int_N(self):
-        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', -1, 4.00)
+        self.assertRaises(ValueError, self.co_sys.n_for_x, 'soda', -1, 4.00)
 
     # pass limit that is not multiple of N
     def test_limit_not_multiple(self):
-        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, 3.00, 7)
+        self.assertRaises(ValueError, self.co_sys.n_for_x, 'soda', 5, 3.00, 7)
 
     # pass non int limit
     def test_limit_not_int(self):
-        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, 3.00, 1.1)
+        self.assertRaises(ValueError, self.co_sys.n_for_x, 'soda', 5, 3.00, 1.1)
 
     # X less than 0.01
     def test_x_not_valid(self):
-        self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, -0.01)
+        self.assertRaises(ValueError, self.co_sys.n_for_x, 'soda', 5, -0.01)
 
     # test remove special
     def test_remove_special(self):
-        self.co_sys.NforX('soda', 10, 5.00)
+        self.co_sys.n_for_x('soda', 10, 5.00)
         self.co_sys.remove_special('soda')
         self.assertEqual(self.co_sys.items['soda'].special, None)
         self.assertEqual(self.co_sys.calculate_price('soda', 10), 10)
