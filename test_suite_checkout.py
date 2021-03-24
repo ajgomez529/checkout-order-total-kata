@@ -192,87 +192,87 @@ class buyNgetMatXoffTest(unittest.TestCase):
 
     # add special, no limit
     def test_add_buyNMX_no_limit(self):
-        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
+        self.co_sys.buy_n_get_m('soda', 1, 1, 100)
         item = self.co_sys.items['soda']
         self.assertEqual(item.special, [3, 1, 1, 100, None])
 
     # add special, limit
     def test_add_buyNMX_limit(self):
-        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100, 4)
+        self.co_sys.buy_n_get_m('soda', 1, 1, 100, 4)
         item = self.co_sys.items['soda']
         self.assertEqual(item.special, [3, 1, 1, 100, 4])
 
     # calc special, no limit
     def test_calc_buyNMX_no_limit(self):
-        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
+        self.co_sys.buy_n_get_m('soda', 1, 1, 100)
         self.assertEqual(self.co_sys.calculate_price('soda', 10), 5.00)
 
     # calc special, limit
     def test_calc_buyNMX_limit(self):
-        self.co_sys.buyNgetMatXoff('soda', 2, 2, 50, 8)
+        self.co_sys.buy_n_get_m('soda', 2, 2, 50, 8)
         self.assertEqual(self.co_sys.calculate_price('soda', 12), 10)
 
     # calc special, weighed item, no limit
     def test_calc_buyNMX_weighed_no_limit(self):
-        self.co_sys.buyNgetMatXoff('onion', 2, 1, 50)
+        self.co_sys.buy_n_get_m('onion', 2, 1, 50)
         self.assertEqual(self.co_sys.calculate_price('onion', 4.75), 4.25)
 
     # calc special, weighed item, limit
     def test_calc_buyNMX_weighed_limit(self):
-        self.co_sys.buyNgetMatXoff('onion', 4, 4, 100, 16)
+        self.co_sys.buy_n_get_m('onion', 4, 4, 100, 16)
         self.assertEqual(self.co_sys.calculate_price('onion', 20), 12.00)
 
     # calc special, qty < N
     def test_calc_buyNMX_low_qty(self):
-        self.co_sys.buyNgetMatXoff('soda', 10, 10, 100)
+        self.co_sys.buy_n_get_m('soda', 10, 10, 100)
         self.assertEqual(self.co_sys.calculate_price('soda', 9), 9.00)
 
     # calc special with markdown
     def test_calc_buyNMX_markdown(self):
         self.co_sys.markdown('soda', 0.50)
-        self.co_sys.buyNgetMatXoff('soda', 5, 5, 50)
+        self.co_sys.buy_n_get_m('soda', 5, 5, 50)
         self.assertEqual(self.co_sys.calculate_price('soda', 12), 4.75)
 
     # KeyError if no item
     def test_buyNMX_no_item(self):
-        self.assertRaises(KeyError, self.co_sys.buyNgetMatXoff, "pop", 10, 10, 100)
+        self.assertRaises(KeyError, self.co_sys.buy_n_get_m, "pop", 10, 10, 100)
 
     # test non int value for N
     def test_N_not_int(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5.5, 2, 100)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5.5, 2, 100)
 
      # test negative value for N
     def test_N_negative(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', -1, 2, 100)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', -1, 2, 100)
 
     # test non int value for M
     def test_M_not_int(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2.2, 100)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, 2.2, 100)
 
     # test negative value for M
     def test_M_negative(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, -2.2, 100)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, -2.2, 100)
 
     # test non int value for X
     def test_X_not_int(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 50.5)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, 2, 50.5)
 
     # test X out of bounds (1-100)
     def test_X_out_of_bounds(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 101)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, 2, 101)
 
     # test non int limit
     def test_limit_not_int(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 100, 14.1)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, 2, 100, 14.1)
 
     # test limit not multiple of N+M
     def test_limit_not_multiple(self):
-        self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 100, 15)
+        self.assertRaises(ValueError, self.co_sys.buy_n_get_m, 'soda', 5, 2, 100, 15)
 
     # test remove all specials
     def test_remove_all_specials(self):
-        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
-        self.co_sys.buyNgetMatXoff('onion', 1, 1, 100)
+        self.co_sys.buy_n_get_m('soda', 1, 1, 100)
+        self.co_sys.buy_n_get_m('onion', 1, 1, 100)
         self.co_sys.remove_all_specials()
         self.assertEqual(self.co_sys.items['soda'].special, None)
         self.assertEqual(self.co_sys.items['onion'].special, None)
@@ -281,7 +281,7 @@ class buyNgetMatXoffTest(unittest.TestCase):
 
     # test line #349, where quanity % (N+M) is greater than N but less than M
     def test_qty_between_N_and_M(self):
-        self.co_sys.buyNgetMatXoff('soda', 5, 5, 50)
+        self.co_sys.buy_n_get_m('soda', 5, 5, 50)
         self.assertEqual(self.co_sys.calculate_price('soda', 17), 13.50)
 
 class OrderTest(unittest.TestCase):

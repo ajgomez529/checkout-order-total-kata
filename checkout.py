@@ -18,7 +18,7 @@ Usage example:
     checkout_sys.register_item('ground beef', 3.00, 'lb')
 
     checkout_sys.markdown('yogurt', 0.25)
-    checkout_sys.buyNgetMatXoff('ground beef', 2, 1, 100)
+    checkout_sys.buy_n_get_m('ground beef', 2, 1, 100)
 
     order = checkout.Order(checkout_sys)
 
@@ -199,7 +199,7 @@ class CheckoutSystem:
 
         self.items[name].special = [2, N, X, limit]
 
-    def buyNgetMatXoff(self, name, N, M, X, limit=None):
+    def buy_n_get_m(self, name, N, M, X, limit=None):
         """Applies a buy N, get M for X% off special to an existing item.
 
         When applied to an item, after purchasing {N} units at regular price,
