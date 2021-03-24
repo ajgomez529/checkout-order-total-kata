@@ -284,6 +284,11 @@ class BuyNGetMTest(unittest.TestCase):
         self.co_sys.buy_n_get_m('soda', 5, 5, 50)
         self.assertEqual(self.co_sys.calculate_price('soda', 17), 13.50)
 
+    # test receive discount price on partial weight of M
+    def test_remove_item_invalidate_special(self):
+        self.co_sys.buy_n_get_m('onion', 3, 1, 50)
+        self.assertEqual(self.co_sys.calculate_price('onion', 3.50), 3.25)
+
 class OrderTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
@@ -352,7 +357,7 @@ class OrderTest(unittest.TestCase):
 
     # invalidate special after scanning
     def test_invalidate_special(self):
-        self.co_sys.n_for_x('soda', 2, 1, 100)
+        self.co_sys.n_for_x('soda', 2, 1.00)
         self.order.scan_item('soda')
         self.order.scan_item('soda')
         self.order.scan_item('soda')
@@ -361,6 +366,22 @@ class OrderTest(unittest.TestCase):
         self.assertEqual(self.order.return_total(), 2.00)  # price unchanged
         self.order.calculate_total()  # trigger recalculation of total
         self.assertEqual(self.order.return_total(), 3.00)  # special removed
+
+    # invalidate special after removing item
+    def test_remove_item_invalidate_special(self):
+        self.co_sys.n_for_x('soda', 4, 2.00)
+        self.order.scan_item('soda', 4)
+        self.assertEqual(self.order.return_total(), 2.00)
+        self.order.remove_item_qty('soda', 1)
+        self.assertEqual(self.order.return_total(), 3.00)
+
+    # validate special after adding item
+    def test_add_item_validate_special(self):
+        self.co_sys.n_for_x('soda', 4, 2.00)
+        self.order.scan_item('soda', 3)
+        self.assertEqual(self.order.return_total(), 3.00)
+        self.order.scan_item('soda')
+        self.assertEqual(self.order.return_total(), 2.00)
 
 if __name__ == '__main__':
     unittest.main()
