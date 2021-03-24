@@ -102,7 +102,7 @@ class MarkdownTest(unittest.TestCase):
         self.assertEqual(self.co_sys.items['soda'].markdown, None)
         self.assertEqual(self.co_sys.items['onion'].markdown, None)
 
-class n_for_xTest(unittest.TestCase):
+class NForXTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
         self.co_sys.register_item('onion', 1.00, 'lbs')
@@ -184,7 +184,7 @@ class n_for_xTest(unittest.TestCase):
 
 
 
-class buyNgetMatXoffTest(unittest.TestCase):
+class BuyNGetMTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
         self.co_sys.register_item('onion', 1.00, 'lbs')
