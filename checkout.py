@@ -35,16 +35,16 @@ class Item:
     Attributes:
         name: item name as string (e.g. 'soup').
         price: price in USD as float (e.g. 2.99).
-        soldBy: how the item is sold as string (e.g. 'lbs').
+        sold_by: how the item is sold as string (e.g. 'lbs').
         markdown: float representing discount off regular price
         special: init as None; stores parameters for special savings on
           item. Only one special can be applied at a time.
     """
 
-    def __init__(self, name, price, soldBy):
+    def __init__(self, name, price, sold_by):
         self.name = name
         self.price = price
-        self.soldBy = soldBy
+        self.sold_by = sold_by
         self.markdown = None
         self.special = None
 
@@ -59,7 +59,7 @@ class CheckoutSystem:
     def __init__(self):
         self.items = {}
 
-    def register_item(self, name, price, soldBy='unit'):
+    def register_item(self, name, price, sold_by='unit'):
         """Adds item to checkout system.
 
         Creates Item object and stores in checkout system.
@@ -67,7 +67,7 @@ class CheckoutSystem:
         Args:
             name: item name as string (e.g. 'soup').
             price: price in USD as float (e.g. 2.99).
-            soldBy: optional; how the item is sold as string (e.g. 'lbs').
+            sold_by: optional; how the item is sold as string (e.g. 'lbs').
               if not provided, 'unit' is assumed.
         Raises:
             ValueError if price is less than $0.01
@@ -75,7 +75,7 @@ class CheckoutSystem:
         if price < 0.01:
             raise ValueError("Price must be greater than zero")
 
-        item = Item(name, price, soldBy)
+        item = Item(name, price, sold_by)
         self.items[name] = item
 
     def unregister_item(self, name):
@@ -383,7 +383,7 @@ class Order():
         Args:
             name: item name as a string (e.g. 'soup')
             qty: optional; float or int representing the amount of the item
-              being purchased in its 'soldBy' field. for items sold by unit,
+              being purchased in its 'sold_by' field. for items sold by unit,
               an integer value must be provided for qty
         Raises:
             KeyError if item name does not exist in checkout_sys
@@ -393,7 +393,7 @@ class Order():
             self.scanned_items[name] += qty
         else:
             item = self.__checkout_sys.items[name]
-            if item.soldBy == 'unit' and not isinstance(qty, int):
+            if item.sold_by == 'unit' and not isinstance(qty, int):
                 raise ValueError('Qty for unit item must be an integer')
             else:
                 self.scanned_items[name] = qty
@@ -406,7 +406,7 @@ class Order():
         Args:
             name: item name as a string (e.g. 'soup')
             qty: optional; float or int representing the amount of the item
-              being purchased in its 'soldBy' field. for items sold by unit,
+              being purchased in its 'sold_by' field. for items sold by unit,
               an integer value must be provided for qty
 
         Raises:
@@ -417,7 +417,7 @@ class Order():
             raise ValueError("Item not in order")
         else:
             item = self.__checkout_sys.items[name]
-            if item.soldBy == 'unit' and not isinstance(qty, int):
+            if item.sold_by == 'unit' and not isinstance(qty, int):
                 raise ValueError('Qty must be int value for item sold by unit')
             elif qty >= self.scanned_items[name]:  # allow larger qty
                 self.scanned_items.pop(name)
@@ -435,10 +435,10 @@ class Order():
 
         Args: None
         """
-        newTotal = 0
+        new_total = 0
         for k, v in self.scanned_items.items():
-            newTotal += self.__checkout_sys.calculate_price(k, v)
-        self.total = newTotal
+            new_total += self.__checkout_sys.calculate_price(k, v)
+        self.total = new_total
 
     def return_total(self):
         """Returns current order total"""

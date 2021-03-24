@@ -11,7 +11,7 @@ class ItemSetUp(unittest.TestCase):
         item = self.co_sys.items['steak']
         self.assertEqual(item.name, 'steak')
         self.assertEqual(item.price, 7.99)
-        self.assertEqual(item.soldBy, 'lbs')
+        self.assertEqual(item.sold_by, 'lbs')
 
     # add unit item and verify values
     def test_add_unit_item(self):
@@ -19,7 +19,7 @@ class ItemSetUp(unittest.TestCase):
         item = self.co_sys.items['soup']
         self.assertEqual(item.name, 'soup')
         self.assertEqual(item.price, 1.50)
-        self.assertEqual(item.soldBy, 'unit')
+        self.assertEqual(item.sold_by, 'unit')
 
     # add and remove item
     def test_remove_item(self):
@@ -87,6 +87,20 @@ class MarkdownTest(unittest.TestCase):
     # KeyError if item does not exist
     def test_markdown_no_item(self):
         self.assertRaises(KeyError, self.co_sys.markdown, 'onion1', 2.00)
+
+    # test remove markdown
+    def test_remove_markdown(self):
+        self.co_sys.markdown('soda', 0.50)
+        self.co_sys.remove_markdown('soda')
+        self.assertEqual(self.co_sys.items['soda'].markdown, None)
+
+    # test remove all markdowns
+    def test_remove_all_markdowns(self):
+        self.co_sys.markdown('soda', 0.50)
+        self.co_sys.markdown('onion', 0.50)
+        self.co_sys.remove_all_markdowns()
+        self.assertEqual(self.co_sys.items['soda'].markdown, None)
+        self.assertEqual(self.co_sys.items['onion'].markdown, None)
 
 class NforXTest(unittest.TestCase):
     def setUp(self):
@@ -160,6 +174,13 @@ class NforXTest(unittest.TestCase):
     # X less than 0.01
     def test_x_not_valid(self):
         self.assertRaises(ValueError, self.co_sys.NforX, 'soda', 5, -0.01)
+
+    # test remove special
+    def test_remove_special(self):
+        self.co_sys.NforX('soda', 10, 5.00)
+        self.co_sys.remove_special('soda')
+        self.assertEqual(self.co_sys.items['soda'].special, None)
+        self.assertEqual(self.co_sys.calculate_price('soda', 10), 10)
 
 
 
@@ -248,6 +269,21 @@ class buyNgetMatXoffTest(unittest.TestCase):
     def test_limit_not_multiple(self):
         self.assertRaises(ValueError, self.co_sys.buyNgetMatXoff, 'soda', 5, 2, 100, 15)
 
+    # test remove all specials
+    def test_remove_all_specials(self):
+        self.co_sys.buyNgetMatXoff('soda', 1, 1, 100)
+        self.co_sys.buyNgetMatXoff('onion', 1, 1, 100)
+        self.co_sys.remove_all_specials()
+        self.assertEqual(self.co_sys.items['soda'].special, None)
+        self.assertEqual(self.co_sys.items['onion'].special, None)
+        self.assertEqual(self.co_sys.calculate_price('soda', 2), 2.00)
+        self.assertEqual(self.co_sys.calculate_price('onion', 2), 2.00)
+
+    # test line #349, where quanity % (N+M) is greater than N but less than M
+    def test_qty_between_N_and_M(self):
+        self.co_sys.buyNgetMatXoff('soda', 5, 5, 50)
+        self.assertEqual(self.co_sys.calculate_price('soda', 17), 13.50)
+
 class OrderTest(unittest.TestCase):
     def setUp(self):
         self.co_sys = checkout.CheckoutSystem()
@@ -303,11 +339,16 @@ class OrderTest(unittest.TestCase):
 
     # ValueError if removing unit item in non-integer value
     def test_remove_unit_item_bad_qty(self):
-        self.assertRaises(ValueError,self.order.remove_item_qty, "soda", 1.5)
+        self.order.scan_item('soda')
+        self.assertRaises(ValueError, self.order.remove_item_qty, 'soda', 1.50)
 
-
-
-
+    # remove item from scanned items if qty is >= qty present
+    def test_remove_from_scanned_items(self):
+        self.order.scan_item('onion', 3.0)
+        self.order.scan_item('onion', 2.0)
+        self.order.remove_item_qty('onion', 5.0)
+        self.assertRaises(ValueError, self.order.remove_item_qty, 'onion', 1)
+        self.assertEqual(self.order.scanned_items.get('onion'), None)
 
 if __name__ == '__main__':
     unittest.main()
