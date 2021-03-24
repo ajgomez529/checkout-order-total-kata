@@ -25,4 +25,4 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        pytest --cov-report term-missing--cov=checkout test_suite_checkout.py
+        pytest --cov-report term-missing --cov=checkout test_suite_checkout.py
