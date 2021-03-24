@@ -1,31 +1,31 @@
 # checkout-order-total-kata
-Python library implementing business logic for grocery point-of-sale system
+Python module implementing business logic for grocery point-of-sale system
 
 Based on the following: https://github.com/PillarTechnology/kata-checkout-order-total
 
 ## Requirements
 Tested in Python 3.6+.
-No additional dependencies used. 
+No additional dependencies used.
 
 ## Installation
-Place `checkout.py` in your project directory. To run the test suite, ensure `checkout.py` and `test_suite_checkout.py` are in the same directory. 
+Place `checkout.py` in your project directory. To run the test suite, ensure `checkout.py` and `test_suite_checkout.py` are in the same directory.
 ## Usage
 ```python
 import checkout
 
-checkout_sys = checkout.CheckoutSystem()  # create checkout system
+checkout_system = checkout.CheckoutSystem()  # create checkout system
 
-checkout_sys.register_item('soup', 1.99)  # add item sold by unit
-checkout_sys.register_item('onion', 1.00, 'lb')  # add item sold by lb
+checkout_system.register_item('soup', 1.99)  # add item sold by unit
+checkout_system.register_item('onion', 1.00, 'lb')  # add item sold by lb
 
-checkout_sys.markdown('soup', 0.50)  # $0.50 markdown on soup
-checkout_sys.NforX('onion', 3, 2.00)  # buy 3 lbs of onions for $2.00
+checkout_system.markdown('soup', 0.50)  # $0.50 markdown on soup
+checkout_system.n_for_x('onion', 3, 2.00)  # buy 3 lbs of onions for $2.00
 
-order = checkout.Order(checkout_sys)  #initialize order using checkout_sys
+order = checkout.Order(checkout_system)  #initialize order using checkout_system
 
 order.scan_item('soup')  # scan unit of soup
 order.scan_item('onion', 4.0)  # scan 4 lb of onions
-order.remove_item('onion', 1.0)  # remove 1 lb of onion
+order.remove_item_qty('onion', 1.0)  # remove 1 lb of onion
 print (order.return_total())  # returns order total - 3.49
 # onion - 3 lb for $2.00
 # soup - $1.99 - $0.50 markdown
